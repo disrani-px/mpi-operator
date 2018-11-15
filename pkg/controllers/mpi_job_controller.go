@@ -16,6 +16,7 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -501,7 +502,7 @@ func allocateGPUs(mpiJob *kubeflow.MPIJob, gpusPerNode int, done bool) (workerRe
 		}
 	} else if mpiJob.Spec.Replicas != nil {
 		workerReplicas = int(*mpiJob.Spec.Replicas)
-		container := mpiJob.Spec.Template.Spec.Containers[0]
+		container := mpiJob.Spec.WorkerPodTemplateSpec.Spec.Containers[0]
 		if container.Resources.Limits != nil {
 			if val, ok := container.Resources.Limits[gpuResourceName]; ok {
 				gpus, _ := val.AsInt64()
@@ -867,13 +868,16 @@ func newLauncherRoleBinding(mpiJob *kubeflow.MPIJob) *rbacv1.RoleBinding {
 // sets the appropriate OwnerReferences on the resource so handleObject can
 // discover the MPIJob resource that 'owns' it.
 func newWorker(mpiJob *kubeflow.MPIJob, desiredReplicas int32, gpus int) *appsv1.StatefulSet {
+	jb, _ := json.MarshalIndent(mpiJob, "", "  ")
+	fmt.Print(string(jb))
+
 	labels := map[string]string{
 		labelGroupName:   "kubeflow.org",
 		labelMPIJobName:  mpiJob.Name,
 		labelMPIRoleType: worker,
 	}
 
-	podSpec := mpiJob.Spec.Template.DeepCopy()
+	podSpec := mpiJob.Spec.WorkerPodTemplateSpec.DeepCopy()
 	// keep the labels which are set in PodTemplate
 	if len(podSpec.Labels) == 0 {
 		podSpec.Labels = make(map[string]string)
@@ -882,6 +886,7 @@ func newWorker(mpiJob *kubeflow.MPIJob, desiredReplicas int32, gpus int) *appsv1
 	for key, value := range labels {
 		podSpec.Labels[key] = value
 	}
+
 	// always set restartPolicy to restartAlways for statefulset
 	podSpec.Spec.RestartPolicy = corev1.RestartPolicyAlways
 
@@ -941,8 +946,9 @@ func newWorker(mpiJob *kubeflow.MPIJob, desiredReplicas int32, gpus int) *appsv1
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
-			ServiceName: mpiJob.Name + workerSuffix,
-			Template:    *podSpec,
+			ServiceName:          mpiJob.Name + workerSuffix,
+			Template:             *podSpec,
+			VolumeClaimTemplates: mpiJob.Spec.WorkerVolumeClaimTemplate,
 		},
 	}
 }
@@ -958,7 +964,7 @@ func newLauncher(mpiJob *kubeflow.MPIJob, kubectlDeliveryImage string) *batchv1.
 		labelMPIRoleType: launcher,
 	}
 
-	podSpec := mpiJob.Spec.Template.DeepCopy()
+	podSpec := mpiJob.Spec.LauncherPodTemplateSpec.DeepCopy()
 	// copy the labels and annotations to pod from PodTemplate
 	if len(podSpec.Labels) == 0 {
 		podSpec.Labels = make(map[string]string)

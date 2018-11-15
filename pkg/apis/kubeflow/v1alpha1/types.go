@@ -59,8 +59,15 @@ type MPIJobSpec struct {
 	// +optional
 	Replicas *int32 `json:"replicas,omitempty"`
 
-	// Describes the pod that will be created when executing an MPIJob.
-	Template corev1.PodTemplateSpec `json:"template,omitempty"`
+	// WorkerPodTemplateSpec describes the pod that will be created when executing an MPIJob.
+	WorkerPodTemplateSpec corev1.PodTemplateSpec `json:"workerPodTemplateSpec,omitempty"`
+
+	// LauncherPodTemplateSpec describes the pod that will be created when executing an MPIJob.
+	LauncherPodTemplateSpec corev1.PodTemplateSpec `json:"launcherPodTemplateSpec,omitempty"`
+
+	// WorkerVolumeClaimTemplate describes the volume claim template to use
+	// for stateful set through which pods are deployed.
+	WorkerVolumeClaimTemplate []corev1.PersistentVolumeClaim `json:"workerVolumeClaimTemplate,omitempty"`
 }
 
 type MPIJobLauncherStatusType string

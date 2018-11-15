@@ -85,7 +85,7 @@ func newMPIJob(name string, gpus *int32) *kubeflow.MPIJob {
 		},
 		Spec: kubeflow.MPIJobSpec{
 			GPUs: gpus,
-			Template: corev1.PodTemplateSpec{
+			WorkerPodTemplateSpec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
@@ -108,7 +108,7 @@ func newMPIJobWithCustomResources(name string, replicas *int32, gpusPerReplica i
 		},
 		Spec: kubeflow.MPIJobSpec{
 			Replicas: replicas,
-			Template: corev1.PodTemplateSpec{
+			WorkerPodTemplateSpec: corev1.PodTemplateSpec{
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{

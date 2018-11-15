@@ -101,7 +101,7 @@ func (in *MPIJobSpec) DeepCopyInto(out *MPIJobSpec) {
 		*out = new(int32)
 		**out = **in
 	}
-	in.Template.DeepCopyInto(&out.Template)
+	in.WorkerPodTemplateSpec.DeepCopyInto(&out.WorkerPodTemplateSpec)
 	return
 }
 

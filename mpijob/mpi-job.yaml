@@ -1,0 +1,16 @@
+apiVersion: kubeflow.org/v1alpha1
+kind: MPIJob
+metadata:
+  creationTimestamp: null
+  name: mpi-job
+spec:
+  replicas: 3
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - image: gcr.io/tf-on-k8s-dogfood/tf_sample:dc944ff
+        name: tensorflow
+        resources: {}
+status: {}
