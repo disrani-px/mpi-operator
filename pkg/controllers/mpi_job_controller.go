@@ -751,7 +751,7 @@ func newConfigMap(mpiJob *kubeflow.MPIJob, workerReplicas int, gpusPerWorker int
 set -x
 POD_NAME=$1
 shift
-%s/kubectl exec ${POD_NAME} -- /bin/sh -c "$*"
+%s/kubectl exec -t ${POD_NAME} -- /bin/sh -c "$*"
 `, kubectlMountPath)
 
 	// If no GPU is specified, default to 1 slot.
@@ -891,8 +891,16 @@ func newWorker(mpiJob *kubeflow.MPIJob, desiredReplicas int32, gpus int) *appsv1
 	podSpec.Spec.RestartPolicy = corev1.RestartPolicyAlways
 
 	container := podSpec.Spec.Containers[0]
-	container.Command = []string{"sleep"}
-	container.Args = []string{"365d"}
+	container.Command = []string{
+		"/bin/sh",
+		"-c",
+	}
+	container.Args = []string{
+		"echo ${HOSTNAME} is now sleeping forever; " +
+			"echo launcher pod will kubectl exec into this pod to run MPI commands;" +
+			"echo expect no logs from worker to be displayed here;" +
+			"sleep 365d",
+	}
 	if container.Resources.Limits == nil {
 		container.Resources.Limits = make(corev1.ResourceList)
 	}
