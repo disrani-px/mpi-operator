@@ -18,7 +18,9 @@ spec:
       serviceAccountName: mpi-operator
       containers:
       - name: mpi-operator
-        image: mpioperator/mpi-operator:latest
+        image: sdeoras/mpi-operator:latest
+        command:
+          - /mpi-operator
         args: [
           "--gpus-per-node", "8",
           "--kubectl-delivery-image",
