@@ -1,4 +1,4 @@
-module github.com/sdeoras/mpi-operator
+module github.com/kubeflow/mpi-operator
 
 require (
 	github.com/PuerkitoBio/purell v1.1.0 // indirect
@@ -22,7 +22,6 @@ require (
 	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/json-iterator/go v0.0.0-20180701071628-ab8a2e0c74be // indirect
 	github.com/juju/ratelimit v1.0.1 // indirect
-	github.com/kubeflow/mpi-operator v0.0.0-20180906185046-52b2be224522
 	github.com/mailru/easyjson v0.0.0-20180730094502-03f2033d19d5 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
